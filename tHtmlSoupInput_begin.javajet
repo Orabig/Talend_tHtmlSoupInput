@@ -132,15 +132,15 @@ try {
 	/*
 	 * Get scheme & host.
 	 */
-	java.net.URI uri = new java.net.URI(<%=uRL %>);
+	String url_<%=cid%> = <%=uRL %>;
+	java.net.URI uri = new java.net.URI(url_<%=cid%>);
 	scheme_<%=cid %> = uri.getScheme();
 	host_<%=cid %> = uri.getHost();
 
 	/*
 	 * Connect.
 	 */
-	//document_<%=cid %> = org.jsoup.Jsoup.connect(<%=uRL %>).get();
-	connection_<%=cid %> = org.jsoup.Jsoup.connect(<%=uRL %>);
+	connection_<%=cid %> = org.jsoup.Jsoup.connect(url_<%=cid%>);
     
 	/*
 	 * Set timeout.
