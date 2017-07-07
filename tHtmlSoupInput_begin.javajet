@@ -127,7 +127,6 @@ int parseStatus_<%=cid %> = 0;
 String parseErrorText_<%=cid %> = null;
 Date getTimestamp_<%=cid %> = null;
 Long getTime_<%=cid %> = null;
-//System.out.println("PASSED-1");
 
 try {
 	/*
@@ -233,7 +232,6 @@ if ("\"*\"".equalsIgnoreCase(parentElement))
 {
 %>
 	elements_<%=cid %> =document_<%=cid%>.body().children().select(<%=parentElement %>);
-	//System.out.println("metadatas"+elements_<%=cid %>);
 <%}
 else 
 {
@@ -287,23 +285,24 @@ for (org.jsoup.nodes.Element element_<%=cid%> : elements_<%=cid %>)
 							else
 							{
 							String select=header.get("QUERY");
-
-	if ( select.endsWith(" @href\"")) {
-		select = select.substring(0,select.length()-7)+"\"";
 %>
-		org.jsoup.select.Elements element_<%=column.getLabel() %> = element_<%=cid %>.select(<%= select %>); 
-		<%=documentOut.getName()%>.<%=column.getLabel() %> =element_<%=column.getLabel() %>==null ? null :
-								element_<%=column.getLabel() %>.first()==null ? null :
-								element_<%=column.getLabel() %>.first().attr("href");
+		String select_<%=cid%>_<%=column.getLabel() %> = <%= select %>;
+		// Syntax for attribute is : "(...).@attribute-name" or "(...) @attribute-name" or "(...)/@attribute-name"
+		java.util.regex.Pattern askForAttributePattern_<%=cid%>_<%=column.getLabel() %> = java.util.regex.Pattern.compile("[\\. /]@([\\w\\-]+)$");
+		java.util.regex.Matcher askForAttribute_<%=cid%>_<%=column.getLabel() %> =
+				askForAttributePattern_<%=cid%>_<%=column.getLabel() %>.matcher(select_<%=cid%>_<%=column.getLabel() %>);
+		
+		if (askForAttribute_<%=cid%>_<%=column.getLabel() %>.find()) {
+			String attribute = askForAttribute_<%=cid%>_<%=column.getLabel() %>.group(1);
+			select_<%=cid%>_<%=column.getLabel() %> = askForAttribute_<%=cid%>_<%=column.getLabel() %>.replaceFirst(""); // Removes the attribute from the JSoup selector
+			org.jsoup.select.Elements element_<%=column.getLabel() %> = element_<%=cid %>.select( select_<%=cid%>_<%=column.getLabel() %> ); 
+			<%=documentOut.getName()%>.<%=column.getLabel() %> = element_<%=column.getLabel() %>.attr(attribute);
+		} else {
+			org.jsoup.select.Elements element_<%=column.getLabel() %> = element_<%=cid %>.select( select_<%=cid%>_<%=column.getLabel() %> ); 
+			<%=documentOut.getName()%>.<%=column.getLabel() %> = element_<%=column.getLabel() %>.text();
+		}
+		
 <%
-	} else {
-%>
-		org.jsoup.select.Elements element_<%=column.getLabel() %> = element_<%=cid %>.select(<%= select %>); 
-		<%=documentOut.getName()%>.<%=column.getLabel() %> =element_<%=column.getLabel() %>.hasText()
-					? element_<%=column.getLabel() %>.text()
-					: element_<%=cid %>.text();
-<%
-	}
 					
 							}
 						}
